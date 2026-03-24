@@ -72,6 +72,11 @@ ls -lh "$BUILD_DIR" | grep -v "^total" | awk '{printf "│    %s  %s\n", $5, $9}
 echo "└─ Tamam"
 echo ""
 
+# ── 3.5. Önbellek Kırıcı (Bypass Emscripten Caching) ────────────────
+sed -i 's/"game.data"/"game.data?v='$(date +%s)'"/g' "$BUILD_DIR/game.js"
+echo "✓  Emscripten game.data cache bypass eklendi"
+
+
 # ── 4. Özelleştirilmiş index.html ───────────────────────────────────
 if [ -f "${GAME_DIR}/web/index.html" ]; then
   cp "${GAME_DIR}/web/index.html" "${BUILD_DIR}/index.html"

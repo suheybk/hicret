@@ -49,6 +49,7 @@ jobs:
       - name: Build with love.js
         run: |
           love.js hicret.love dist --title "Hicret" --memory 268435456
+          sed -i 's/"game.data"/"game.data?v='$(date +%s)'"/g' dist/game.js
           ls -lh dist/
 
       - name: Apply custom web files
