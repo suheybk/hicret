@@ -79,8 +79,18 @@ function ChapterState:update(dt)
 
   elseif self.phase == "outro" then
     if self.timer >= 2.0 then
-      -- Bölümü tamamla ve sonuç ekranına geç
+      -- Bölümü tamamla
       SaveSystem.completeChapter(self.chapter_id)
+
+      -- Bir sonraki bölümün kilidini aç
+      local chapter_order = { "gaza", "uyghur", "rohingya", "syria", "yemen", "kashmir" }
+      for i, ch in ipairs(chapter_order) do
+        if ch == self.chapter_id and chapter_order[i + 1] then
+          SaveSystem.unlockChapter(chapter_order[i + 1])
+          break
+        end
+      end
+
       -- Oyuncu durumunu kaydet
       local state = self.engine:getState()
       state._act_index = self.act_index
@@ -131,19 +141,7 @@ function ChapterState:draw()
   love.graphics.setColor(1, 1, 1, 1)
 end
 
---- Act tamamlandığında ActState'ten çağrılır
-function ChapterState:onActComplete(result)
-  -- result: { act_id, outcome, state }
-  self.act_index = self.act_index + 1
 
-  if self.act_index > #self.act_list then
-    -- Tüm act'lar bitti
-    self.phase = "outro"
-    self.timer = 0
-  else
-    self:_startNextAct()
-  end
-end
 
 function ChapterState:_startNextAct()
   self.act_index = self.act_index + 1
@@ -154,12 +152,23 @@ function ChapterState:_startNextAct()
   end
   local act_info = self.act_list[self.act_index]
   self.phase     = "acting"
-  StateManager.switch("act", {
+  StateManager.push("act", {
     engine   = self.engine,
     act_id   = act_info.id,
     act_type = act_info.type,
     chapter  = self,   -- geri bildirim için referans
   })
+end
+
+function ChapterState:resume(data)
+  if data and data.act_done then
+    if self.act_index >= #self.act_list then
+      self.phase = "outro"
+      self.timer = 0
+    else
+      self:_startNextAct()
+    end
+  end
 end
 
 function ChapterState:keypressed(key)

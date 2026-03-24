@@ -15,6 +15,33 @@ local BalanceCfg    = require("src.systems.balance_config")
 local I18n          = require("src.systems.i18n")
 local Config        = require("src.utils.config")
 
+-- ─── Lua 5.1 uyumlu UTF-8 yardımcıları ────────────────────────────
+-- LÖVE 11.x LuaJIT (Lua 5.1) kullanır, utf8 kütüphanesi yok.
+-- UTF-8'de devam baytları 0x80-0xBF arasındadır.
+
+local function utf8_len(s)
+  local count = 0
+  for i = 1, #s do
+    local b = s:byte(i)
+    if b < 0x80 or b >= 0xC0 then count = count + 1 end
+  end
+  return count
+end
+
+-- İlk n UTF-8 karakterini döndür
+local function utf8_sub(s, n)
+  if n <= 0 then return "" end
+  local count = 0
+  for i = 1, #s do
+    local b = s:byte(i)
+    if b < 0x80 or b >= 0xC0 then
+      count = count + 1
+      if count > n then return s:sub(1, i - 1) end
+    end
+  end
+  return s
+end
+
 local ActState = {}
 ActState.__index = ActState
 
@@ -202,24 +229,29 @@ function ActState:update(dt)
   -- Delta animasyonları
   self._deltas:update(dt)
 
-  -- Typewriter
+  -- Typewriter (Lua 5.1 uyumlu UTF-8 güvenli)
   if not self.text_done then
     self.type_timer = self.type_timer + dt
-    local new_idx   = math.min(math.floor(self.type_timer * TYPEWRITER_SPEED), #self.text_full)
-    if new_idx > self.type_index then
-      local added = new_idx - self.type_index
-      self.type_sfx_counter = self.type_sfx_counter + added
+
+    local char_count = utf8_len(self.text_full)
+    local new_char   = math.min(math.floor(self.type_timer * TYPEWRITER_SPEED), char_count)
+
+    if new_char > self.type_index then
+      self.type_sfx_counter = self.type_sfx_counter + (new_char - self.type_index)
       while self.type_sfx_counter >= TYPEWRITER_SFX_EVERY do
-        local c = self.text_full:sub(self.type_index+1, self.type_index+1)
-        if c ~= " " and c ~= "\n" and c ~= "" then
-          AudioManager.playSFX("typewriter", 0.32)
-        end
+        AudioManager.playSFX("typewriter", 0.32)
         self.type_sfx_counter = self.type_sfx_counter - TYPEWRITER_SFX_EVERY
       end
     end
-    self.type_index = new_idx
-    self.text_shown = self.text_full:sub(1, new_idx)
-    if new_idx >= #self.text_full then self.text_done = true end
+
+    self.type_index = new_char
+
+    if new_char >= char_count then
+      self.text_shown = self.text_full
+      self.text_done  = true
+    else
+      self.text_shown = utf8_sub(self.text_full, new_char)
+    end
   end
 
   -- Hover
@@ -429,7 +461,7 @@ function ActState:_handleTap(x, y)
   if not self.text_done then
     self.text_shown = self.text_full
     self.text_done  = true
-    self.type_index = #self.text_full
+    self.type_index = utf8_len(self.text_full)
     return
   end
 
@@ -496,7 +528,7 @@ function ActState:keypressed(key)
     if not self.text_done then
       self.text_shown = self.text_full
       self.text_done  = true
-      self.type_index = #self.text_full
+      self.type_index = utf8_len(self.text_full)
     elseif self.node and #self.node.choices == 0 then
       self.engine:advance()
       local drain = self.engine:getDrainDeltas()
@@ -522,8 +554,8 @@ end
 function ActState:_finishAct()
   -- Telemetri: bölüm bitti
   BalanceEngine.endSession(self.engine:getState())
-  if self.chapter_ref and self.chapter_ref.onActComplete then
-    self.chapter_ref:onActComplete({act_id=self.act_id})
+  if self.chapter_ref then
+    StateManager.pop({ act_done = true })
   else
     StateManager.switch("world_map")
   end
