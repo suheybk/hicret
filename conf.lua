@@ -21,4 +21,10 @@ function love.conf(t)
   t.modules.joystick  = false
   t.modules.physics   = false
   t.modules.video     = false
+
+  -- love.js (Emscripten) OpenAL uyumsuzluğu: ses modülleri web'de
+  -- WASM "memory access out of bounds" hatası veriyor.
+  -- Bkz: https://github.com/Davidobot/love.js/issues/106
+  t.modules.audio = false
+  t.modules.sound = false
 end

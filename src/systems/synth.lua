@@ -41,6 +41,7 @@ end
 -- ─── Kaynak fabrikası ───────────────────────────────────────────────
 
 local function makeSoundData(duration_sec, gen_fn)
+  if not love.sound then return nil end
   local n     = math.floor(SAMPLE_RATE * duration_sec)
   local sd    = love.sound.newSoundData(n, SAMPLE_RATE, 16, CHANNELS)
   for i = 0, n - 1 do
@@ -54,6 +55,7 @@ local function makeSoundData(duration_sec, gen_fn)
 end
 
 local function toSource(sd, loop)
+  if not sd or not love.audio then return nil end
   local src = love.audio.newSource(sd)
   if loop then src:setLooping(true) end
   return src

@@ -46,12 +46,13 @@ local _cache = {}
 
 local function _getCached(name, factory)
   if not _cache[name] then
-    -- Her SFX için küçük havuz oluştur
     _cache[name] = {}
     for _ = 1, POOL_SIZE do
       local src = factory()
-      src:setVolume(_vol.sfx * _vol.master)
-      table.insert(_cache[name], src)
+      if src then
+        src:setVolume(_vol.sfx * _vol.master)
+        table.insert(_cache[name], src)
+      end
     end
   end
   return _cache[name]
@@ -119,6 +120,7 @@ function AudioManager.setRegion(region_id)
   if _ambient.region == region_id then return end
 
   local new_src = Synth.ambientDrone(region_id)
+  if not new_src then return end  -- ses modülü devre dışı
   new_src:setVolume(0)
   new_src:play()
 
