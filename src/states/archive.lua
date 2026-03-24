@@ -294,7 +294,7 @@ function ArchiveState:_handleTap(x, y)
     if self.selected then
       self.selected = nil
     else
-      StateManager.switch("world_map")
+      StateManager.switch("menu")
     end
     return
   end
@@ -332,7 +332,7 @@ function ArchiveState:keypressed(key)
     if self.selected then
       self.selected = nil
     else
-      StateManager.switch("world_map")
+      StateManager.switch("menu")
     end
   end
 end

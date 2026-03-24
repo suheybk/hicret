@@ -219,8 +219,6 @@ function NetworkData.maxLevel(region_id)
   return max
 end
 
-return NetworkData
-
 -- ── ROHINGYA / ARAKAN ────────────────────────────────────────────────
 NetworkData.regions["rohingya"] = {
   title = "Rohingya: Zulüm Ağı",
@@ -320,3 +318,5 @@ NetworkData.regions["kashmir"] = {
     { from="tech_blackout", to="kashmir_halk",    type="sanction", label="Bilgiye erişim engeli",      unlock=0 },
   },
 }
+
+return NetworkData

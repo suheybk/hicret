@@ -67,7 +67,7 @@ function BootState:update(dt)
   if self.done then
     self.finish_timer = self.finish_timer - dt
     if self.finish_timer <= 0 then
-      StateManager.switch("world_map")
+      StateManager.switch("menu")
     end
   end
 end

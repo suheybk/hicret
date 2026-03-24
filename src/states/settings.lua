@@ -284,9 +284,6 @@ function SettingsState:_drawSoundSection()
   love.graphics.setLineWidth(0.5)
   love.graphics.rectangle("line", btn.x, btn.y, btn.w, btn.h, 5)
   love.graphics.setFont(self.f_small)
-  love.graphics.setColor(hot and {0.75,0.68,0.52} or {0.45,0.42,0.34})
-  local color = love.graphics.getColor()
-  love.graphics.setColor(color[1] or 0.5, 0.42, 0.34, 1)
   love.graphics.setColor(hot and 0.75 or 0.45, 0.42, 0.34, 1)
   local tw = self.f_small:getWidth(btn.label)
   love.graphics.print(btn.label, btn.x + btn.w/2 - tw/2, btn.y + 9)
@@ -564,9 +561,8 @@ function SettingsState:_inRect(x, y, r)
   return x >= r.x and x <= r.x + r.w and y >= r.y and y <= r.y + r.h
 end
 
-return SettingsState
-
--- Touch iletimi
 function SettingsState:touchmoved(id, x, y, dx, dy, p)
   if self.dragging then self:_updateSlider(self.dragging, x) end
 end
+
+return SettingsState

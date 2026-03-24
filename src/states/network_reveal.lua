@@ -282,23 +282,43 @@ function NetworkRevealState:_updateCaption(dt)
   if self._caption_done then return end
 
   self._caption_timer = self._caption_timer + dt
-  local new_idx = math.floor(self._caption_timer * CAPTION_SPEED)
-  new_idx = math.min(new_idx, #self._caption_full)
 
-  if new_idx > self._caption_index then
-    -- Typewriter ses (daha seyrek)
-    if (new_idx % 4 == 0) then
-      local c = self._caption_full:sub(new_idx, new_idx)
-      if c ~= " " and c ~= "\n" then
-        AudioManager.playSFX("typewriter", 0.18)
+  -- UTF-8 güvenli karakter sayısı (Lua 5.1)
+  local function u8len(s)
+    local c = 0
+    for i = 1, #s do
+      local b = s:byte(i)
+      if b < 0x80 or b >= 0xC0 then c = c + 1 end
+    end
+    return c
+  end
+  local function u8sub(s, n)
+    if n <= 0 then return "" end
+    local c = 0
+    for i = 1, #s do
+      local b = s:byte(i)
+      if b < 0x80 or b >= 0xC0 then
+        c = c + 1
+        if c > n then return s:sub(1, i - 1) end
       end
     end
+    return s
   end
-  self._caption_index = new_idx
-  self._caption_shown = self._caption_full:sub(1, new_idx)
 
-  if new_idx >= #self._caption_full then
-    self._caption_done = true
+  local char_count = u8len(self._caption_full)
+  local new_char   = math.min(math.floor(self._caption_timer * CAPTION_SPEED), char_count)
+
+  if new_char > self._caption_index and new_char % 4 == 0 then
+    AudioManager.playSFX("typewriter", 0.18)
+  end
+
+  self._caption_index = new_char
+
+  if new_char >= char_count then
+    self._caption_shown = self._caption_full
+    self._caption_done  = true
+  else
+    self._caption_shown = u8sub(self._caption_full, new_char)
   end
 end
 
@@ -618,11 +638,11 @@ function NetworkRevealState:_finish()
   StateManager.pop()
 end
 
-return NetworkRevealState
-
--- Touch iletimi (ana yapı zaten touchpressed → _handlePress üzerinden)
+-- Touch iletimi
 function NetworkRevealState:touchpressed(id, x, y, p)
   self:_handlePress(x, y)
 end
 function NetworkRevealState:touchreleased(id, x, y, p) end
 function NetworkRevealState:touchmoved(id, x, y, dx, dy, p) end
+
+return NetworkRevealState

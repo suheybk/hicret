@@ -167,9 +167,10 @@ function OutcomeState:_drawButtons(W, H)
     { label = "Zulüm Ağını Gör",  action = "network" },
     { label = "Arşive Git",       action = "archive" },
     { label = "Haritaya Dön",     action = "map"     },
+    { label = "Ana Menüye Dön",   action = "menu"    },
   }
 
-  local bw, bh = 200, 42
+  local bw, bh = 180, 42
   local gap     = 16
   local total   = #btns * (bw + gap) - gap
   local sx      = W/2 - total/2
@@ -205,6 +206,8 @@ function OutcomeState:_handleTap(x, y)
         StateManager.switch("archive")
       elseif btn.action == "map" then
         StateManager.switch("world_map")
+      elseif btn.action == "menu" then
+        StateManager.switch("menu")
       end
       return
     end
@@ -234,7 +237,7 @@ function OutcomeState:touchpressed(id, x, y, p)
 end
 function OutcomeState:keypressed(key)
   if key=="s" or key=="," then StateManager.push("settings") end
-  if key == "escape" then StateManager.switch("world_map") end
+  if key == "escape" then StateManager.switch("menu") end
 end
 
 return OutcomeState

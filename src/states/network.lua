@@ -14,6 +14,8 @@ local NetworkData  = require("src.systems.network_data")
 local AudioManager = require("src.systems.audio_manager")
 local SaveSystem   = require("src.systems.save_system")
 local Config       = require("src.utils.config")
+local TouchManager = require("src.systems.touch_manager")
+local MapCamera    = require("src.systems.map_camera")
 
 local NetworkState = {}
 NetworkState.__index = NetworkState
@@ -321,8 +323,6 @@ function NetworkState:keypressed(key)
   end
 end
 
-return NetworkState
-
 function NetworkState:wheelmoved(mx, my, dy)
   if self.cam then
     self.cam:wheelzoom(mx, my, dy)
@@ -332,3 +332,5 @@ end
 function NetworkState:touchpressed(id, x, y, p) end
 function NetworkState:touchreleased(id, x, y, p) end
 function NetworkState:touchmoved(id, x, y, dx, dy, p) end
+
+return NetworkState

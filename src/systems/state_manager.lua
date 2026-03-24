@@ -150,7 +150,6 @@ function StateManager.touchmoved(id, x, y, dx, dy, p)
   if _current and _current.touchmoved then _current:touchmoved(id, x, y, dx, dy, p) end
 end
 
-
 --- Aktif durum örneğini döndür (main.lua hook için)
 function StateManager._getCurrent()
   return _current

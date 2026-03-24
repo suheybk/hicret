@@ -334,17 +334,33 @@ function WorldMapState:_drawDot(r)
 end
 
 function WorldMapState:_drawTopBar(W)
-  love.graphics.setColor(0.04, 0.03, 0.03, 0.90)
-  love.graphics.rectangle("fill", 0, 0, W, 48)
+  love.graphics.setColor(0.04, 0.03, 0.03, 0.92)
+  love.graphics.rectangle("fill", 0, 0, W, 52)
   love.graphics.setColor(0.25, 0.22, 0.16, 0.5)
   love.graphics.setLineWidth(0.5)
-  love.graphics.line(0, 48, W, 48)
+  love.graphics.line(0, 52, W, 52)
+
+  -- Sol: Ana Menü geri butonu
+  love.graphics.setFont(self.font_small)
+  love.graphics.setColor(0.48, 0.44, 0.35, 0.85)
+  love.graphics.print("← Ana Menü", 16, 8)
+
+  -- Orta: Başlık
   love.graphics.setFont(self.font_title)
   love.graphics.setColor(0.85, 0.80, 0.65, 1)
-  love.graphics.print("HİCRET", 24, 10)
+  local tw = self.font_title:getWidth("HİCRET")
+  love.graphics.print("HİCRET", W/2 - tw/2, 6)
+
+  -- Orta alt: ipucu
   love.graphics.setFont(self.font_small)
-  love.graphics.setColor(0.35, 0.32, 0.26, 0.8)
-  love.graphics.print("[ S ] AYARLAR  [ A ] ARŞİV  [ N ] AĞ  [ ESC ] ÇIKIŞ", W-330, 18)
+  love.graphics.setColor(0.38, 0.35, 0.27, 0.65)
+  local hint = "Bir bölgeye tıkla"
+  love.graphics.print(hint, W/2 - self.font_small:getWidth(hint)/2, 34)
+
+  -- Sağ: kısayollar
+  love.graphics.setColor(0.32, 0.29, 0.23, 0.75)
+  love.graphics.print("[ S ] Ayarlar  [ A ] Arşiv  [ R ] Sıfırla", W - 278, 19)
+
   love.graphics.setLineWidth(1)
 end
 
@@ -439,7 +455,13 @@ end
 -- ─── Girdi ───────────────────────────────────────────────────────────
 
 function WorldMapState:mousepressed(x, y, btn)
-  if btn == 1 then self:_trySelect(x, y) end
+  if btn == 1 then
+    -- Sol üst "Ana Menü" butonu tıklaması
+    if x < 130 and y < 52 then
+      StateManager.switch("menu"); return
+    end
+    self:_trySelect(x, y)
+  end
 end
 
 function WorldMapState:wheelmoved(mx, my, dy)
@@ -462,11 +484,11 @@ function WorldMapState:touchreleased(id, x, y, p) end
 function WorldMapState:touchmoved(id, x, y, dx, dy, p) end
 
 function WorldMapState:keypressed(key)
-  if key=="a" then StateManager.switch("archive") end
-  if key=="s" or key=="," then StateManager.push("settings") end
-  if key=="n" then StateManager.push("network", {region_id="gaza", level=3}) end
-  if key=="r" then self.cam:reset(); self._zoom_hint_t = self.timer end
-  if key=="u" and love.keyboard.isDown("lctrl") then
+  if key == "escape" then StateManager.switch("menu") end
+  if key == "a" then StateManager.switch("archive") end
+  if key == "s" or key == "," then StateManager.push("settings") end
+  if key == "r" then self.cam:reset(); self._zoom_hint_t = self.timer end
+  if key == "u" and love.keyboard.isDown("lctrl") then
     for _, r in ipairs(self.regions) do SaveSystem.unlockChapter(r.id) end
     print("[DEBUG] Tüm bölgeler açıldı")
   end
