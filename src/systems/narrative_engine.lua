@@ -99,7 +99,7 @@ function NarrativeEngine:startAct(act_id)
 
   -- Denge motoru: perde başı normalizasyonu + chapter init
   BE.onActStart(self.state, found.type, self.chapter_id)
-  BE.startSession and BE.startSession(self.chapter_id)
+  if BE.startSession then BE.startSession(self.chapter_id) end
 
   -- Giriş node'una geç
   self:_gotoNode(found.entry)
