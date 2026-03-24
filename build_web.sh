@@ -63,7 +63,7 @@ echo ""
 echo "┌─ love.js derleniyor (birkaç saniye...)"
 rm -rf "$BUILD_DIR"
 
-love.js -c "$LOVE_FILE" "$BUILD_DIR" \
+love.js "$LOVE_FILE" "$BUILD_DIR" \
   --title "$TITLE" \
   --memory $MEMORY
 
@@ -79,6 +79,11 @@ echo ""
 if [ -f "${GAME_DIR}/web/index.html" ]; then
   cp "${GAME_DIR}/web/index.html" "${BUILD_DIR}/index.html"
   echo "✓  Özelleştirilmiş index.html kopyalandı"
+fi
+
+if [ -f "${GAME_DIR}/web/coi-serviceworker.min.js" ]; then
+  cp "${GAME_DIR}/web/coi-serviceworker.min.js" "${BUILD_DIR}/coi-serviceworker.min.js"
+  echo "✓  coi-serviceworker.min.js kopyalandı"
 fi
 
 # ── 5. Ek web varlıkları ────────────────────────────────────────────
