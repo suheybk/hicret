@@ -73,8 +73,11 @@ echo "└─ Tamam"
 echo ""
 
 # ── 3.5. Önbellek Kırıcı (Bypass Emscripten Caching) ────────────────
-sed -i 's/"game.data"/"game.data?v='$(date +%s)'"/g' "$BUILD_DIR/game.js"
+sed -i "s/80ce17c4-e32b-487e-ad00-d949a302c856/80ce17c4-e32b-487e-ad00-$(date +%s)/g" "$BUILD_DIR/game.js"
+sed -i "s/'game.data'/'game.data?v=$(date +%s)'/g" "$BUILD_DIR/game.js"
 echo "✓  Emscripten game.data cache bypass eklendi"
+
+
 
 
 # ── 4. Özelleştirilmiş index.html ───────────────────────────────────
