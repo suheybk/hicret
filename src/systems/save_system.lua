@@ -43,7 +43,7 @@ function SaveSystem.load()
   local raw = love.filesystem.read(SAVE_FILE)
   if raw then
     local ok, parsed = pcall(json.decode, raw)
-    if ok and parsed and parsed.version == SAVE_VERSION then
+    if ok and type(parsed) == "table" and parsed.version == SAVE_VERSION then
       _data = parsed
       return _data
     end
