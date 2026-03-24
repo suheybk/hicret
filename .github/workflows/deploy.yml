@@ -48,7 +48,7 @@ jobs:
 
       - name: Build with love.js
         run: |
-          love.js hicret.love dist --title "Hicret" --memory 67108864
+          love.js hicret.love dist --title "Hicret" --memory 268435456
           ls -lh dist/
 
       - name: Apply custom web files
