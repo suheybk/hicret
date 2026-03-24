@@ -1,9 +1,7 @@
-name: Build & Deploy Web
+name: Build & Deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
   workflow_dispatch:
 
@@ -13,12 +11,15 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -32,49 +33,38 @@ jobs:
       - name: Install love.js
         run: npm install -g love.js
 
-      - name: Package .love file
+      - name: Create .love package
         run: |
           zip -9 -r hicret.love . \
-            --exclude "__pycache__/*" \
-            --exclude "*.pyc" \
-            --exclude ".DS_Store" \
-            --exclude "Thumbs.db" \
             --exclude ".git/*" \
             --exclude ".github/*" \
-            --exclude "web/*"
-          echo "hicret.love size: $(du -sh hicret.love | cut -f1)"
+            --exclude "web/*" \
+            --exclude "*.sh" \
+            --exclude "*.zip" \
+            --exclude "*.love" \
+            --exclude "*.md" \
+            --exclude "build_web/*"
+          echo "Package size: $(du -sh hicret.love | cut -f1)"
 
-      - name: Build web version
+      - name: Build with love.js
         run: |
-          love.js hicret.love web_build \
-            --title "Hicret" \
-            --memory 67108864
-          echo "Web build complete"
-          ls -lh web_build/
+          love.js hicret.love dist --title "Hicret" --memory 67108864
+          ls -lh dist/
 
-      - name: Replace default index.html
-        run: cp web/index.html web_build/index.html
-
-      - name: Copy additional web assets
+      - name: Apply custom web files
         run: |
-          if [ -d web/assets ]; then
-            cp -r web/assets/* web_build/
-          fi
+          cp web/index.html dist/index.html
+          cp web/coi-serviceworker.min.js dist/coi-serviceworker.min.js
+          echo "Custom files applied"
 
-      - name: Upload Pages artifact
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web_build/
+          path: dist/
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
-
-    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
+        id: deploy
         uses: actions/deploy-pages@v4

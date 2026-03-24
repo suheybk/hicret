@@ -1,162 +1,70 @@
-# HİCRET — LÖVE 2D Oyun Projesi
+# HİCRET
 
-**DUT Interdisciplinary Design Agency**  
-Tür: Narrative / Survival Strategy  
-Motor: LÖVE 2D 11.x (Lua)  
-Platform: Android · iOS · Web (love.js)
+**Zulmü İfşa Et. Yolculuğu Yaşa. Tanıklık Et.**
+
+Filistin'den Doğu Türkistan'a, Arakan'dan Keşmir'e zorla yerinden edilmeyi ve onu mümkün kılan yapıları anlatan narrative-survival oyunu.
+
+**DUT Interdisciplinary Design Agency · LÖVE 2D 11.x (Lua)**
 
 ---
 
-## Kurulum
+## Tarayıcıda Oyna
 
-### LÖVE 2D kurulumu
-1. https://love2d.org adresinden LÖVE 2D 11.5 indir
-2. Bu klasörü LÖVE ile çalıştır:
+GitHub Pages otomatik deploy → her `main` push'unda yeniden derlenir.
 
+**Masaüstünde:**
 ```bash
-# Linux/Mac
-love /path/to/hicret/
-
-# Windows
-"C:\Program Files\LOVE\love.exe" C:\path\to\hicret\
-
-# macOS (drag & drop de çalışır)
-open -a love /path/to/hicret/
+# https://love2d.org → LÖVE 2D 11.5 kur
+love .
 ```
 
-### Web (love.js)
+---
+
+## 6 Bölüm
+
+| Bölge | Tema | Node | Seçim |
+|-------|------|------|-------|
+| Gazze / Filistin | İşgal, abluka | 29 | 12 |
+| Doğu Türkistan | Dijital gözetim | 47 | 16 |
+| Arakan / Rohingya | Vatansızlık, deniz | 46 | 14 |
+| Suriye | İç savaş, Ege geçişi | 46 | 14 |
+| Yemen | Seçilmiş kıtlık | 43 | 14 |
+| Keşmir | İletişim ablukası | 40 | 14 |
+
+251 node · 84 seçim · 12 ağ açılış anı · 18 dayanışma seçimi
+
+---
+
+## GitHub Pages Kurulumu (bir kez)
+
 ```bash
-npm install -g love.js
-love.js /path/to/hicret/ output/ --title "Hicret"
-# output/ klasörünü bir HTTP sunucusunda sun
+git clone https://github.com/KULLANICI/hicret.git
+cd hicret
+git add . && git commit -m "ilk yükleme" && git push
 ```
 
-### Android
-```bash
-# love-android repo: https://github.com/love2d/love-android
-# hicret/ klasörünü .love dosyasına dönüştür:
-cd hicret && zip -9 ../hicret.love -r .
-# love-android/app/src/main/assets/ içine koy
-```
+GitHub → **Settings → Pages → Source: GitHub Actions**  
+GitHub → **Settings → Actions → General → Workflow permissions: Read and write**
+
+Sonraki her push otomatik deploy eder.
 
 ---
 
 ## Proje Yapısı
 
 ```
-hicret/
-├── main.lua                    ← Giriş noktası
-├── conf.lua                    ← LÖVE pencere ayarları
-│
-├── src/
-│   ├── states/
-│   │   ├── boot.lua            ← Yükleme ekranı
-│   │   ├── world_map.lua       ← Dünya haritası
-│   │   ├── chapter.lua         ← Bölüm yöneticisi
-│   │   ├── act.lua             ← Diyalog/karar sahnesi
-│   │   ├── outcome.lua         ← Sonuç ekranı
-│   │   └── archive.lua         ← Tanıklık arşivi
-│   │
-│   ├── systems/
-│   │   ├── state_manager.lua   ← Sonlu durum makinesi
-│   │   ├── narrative_engine.lua← JSON tabanlı anlatı motoru
-│   │   ├── i18n.lua            ← Çok dilli destek (TR/EN/AR)
-│   │   ├── save_system.lua     ← Kayıt/yükleme
-│   │   └── input_manager.lua   ← Birleşik girdi (fare+dokunmatik)
-│   │
-│   └── utils/
-│       ├── config.lua          ← Çözünürlük/viewport
-│       ├── json.lua            ← Hafif JSON encode/decode
-│       └── loader.lua          ← require yolu ayarı
-│
-├── data/
-│   ├── chapters/
-│   │   └── gaza.json           ← Gazze bölümü (3 perde)
-│   └── i18n/
-│       ├── tr.json             ← Türkçe UI metinleri
-│       ├── en.json             ← İngilizce UI metinleri
-│       └── chapter_gaza_tr.json← Gazze bölümü Türkçe metinler
-│
-└── assets/
-    ├── fonts/                  ← .ttf fontlar buraya
-    ├── images/                 ← .png görseller buraya
-    └── sounds/                 ← .ogg sesler buraya
+├── main.lua / conf.lua
+├── src/states/          → Oyun durumları
+├── src/systems/         → Narrative, Audio, Balance, Touch...
+├── src/ui/              → MapRenderer, NetworkUI
+├── data/chapters/       → 6 bölüm JSON
+├── data/i18n/           → TR/EN diyalog metinleri
+├── web/
+│   ├── index.html       → Özel web arayüzü
+│   └── coi-serviceworker.min.js  → GitHub Pages WASM fix
+└── .github/workflows/deploy.yml  → CI/CD
 ```
 
 ---
 
-## Yeni Bölge Eklemek
-
-Kod yazmadan yeni bölge eklenebilir:
-
-1. `data/chapters/{id}.json` → oluştur (gaza.json'u kopyala, düzenle)
-2. `data/i18n/chapter_{id}_tr.json` → diyalog metinleri
-3. `src/states/world_map.lua` → REGIONS tablosuna yeni giriş ekle:
-   ```lua
-   { id="yeni_bolge", x=700, y=300, color={0.8,0.4,0.2}, tag="war" }
-   ```
-4. `src/systems/save_system.lua` → `_default()` içindeki `unlocked` listesine ekle (opsiyonel)
-
----
-
-## Klavye Kısayolları (debug)
-
-| Tuş | Fonksiyon |
-|-----|-----------|
-| `Ctrl+U` | Harita ekranında tüm bölgeleri aç |
-| `ESC` | Haritaya dön |
-| `SPACE / ENTER` | Diyalogda ilerle |
-| `1-9` | Seçim yap |
-
----
-
-## Teknik Notlar
-
-### Çözünürlük sistemi
-- Sanal çözünürlük: **1280×720**
-- Tüm koordinatlar bu sanal uzayda; `Config.pushViewport()` ekranı ölçekler
-- Telefon döndürme ve farklı boyutlar otomatik letterbox/pillarbox ile çözülür
-
-### Anlatı motoru
-- Tüm diyalog ve karar ağaçları **JSON dosyalarında**
-- Motor kodu değişmeden yeni içerik, çeviri veya bölüm eklenebilir
-- Koşullu seçenekler: `"condition": { "flag": "met_neighbor" }`
-- Kaynak etkileri: `"effects": { "trust": 5, "food": -2 }`
-
-### Kayıt sistemi
-- `love.filesystem` kullanır — tüm platformlarda çalışır
-- Web'de tarayıcı IndexedDB'ye yazılır (love.js davranışı)
-- `SaveSystem.reset()` ile sıfırlanabilir
-
----
-
-## Yol Haritası
-
-- [ ] **Faz 1**: Bu iskelet + Gazze bölümü tamamlama
-- [ ] **Faz 2**: Doğu Türkistan bölümü + Zulüm Ağı UI görseli
-- [ ] **Faz 3**: Tüm 6 bölge + ses tasarımı + gerçek görseller
-- [ ] **Faz 4**: Google Play + App Store + web portal
-
----
-
 *"Haber programları istatistik verir; oyun ise sorumluluk yükler."*
-
----
-
-## v0.4 — Ayarlar Ekranı
-
-### Yeni: `src/states/settings.lua`
-- **3 bölüm**: SES / DİL / HAKKINDA
-- **SES**: Ambiyans ve SFX için bağımsız slider — sürükle & bırak, anlık önizleme
-- **DİL**: TR / EN / AR seçimi, anlık arayüz güncelleme, AR için RTL uyarısı
-- **HAKKINDA**: Proje meta bilgisi, versiyon, etik not
-
-### Klavye kısayolları (güncel)
-| Tuş | Fonksiyon |
-|-----|-----------|
-| `S` veya `,` | Ayarlar ekranını aç (her yerden) |
-| `A` | Arşive git |
-| `ESC` | Geri / Kapat |
-| `←` `→` | Slider kontrolü (odaklanıldığında) |
-| `TAB` | Sliderlar arası geçiş |
-| `Ctrl+U` | Debug: tüm bölgeleri aç |

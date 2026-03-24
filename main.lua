@@ -79,11 +79,11 @@ function love.mousemoved(x, y, dx, dy)
   local lx, ly   = Config.toLogical(x, y)
   local ldx = dx * (Config.VIRTUAL_W / Config.screenW)
   local ldy = dy * (Config.VIRTUAL_H / Config.screenH)
-  if StateManager.mousemoved then StateManager.mousemoved(lx, ly, ldx, ldy) end
+  StateManager.mousemoved and StateManager.mousemoved(lx, ly, ldx, ldy)
 end
 function love.wheelmoved(wx, wy)
   local mx, my = Config.toLogical(love.mouse.getPosition())
-  if StateManager.wheelmoved then StateManager.wheelmoved(mx, my, wy) end
+  StateManager.wheelmoved and StateManager.wheelmoved(mx, my, wy)
 end
 
 -- ─── Dokunmatik ─────────────────────────────────────────────────────
