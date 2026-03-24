@@ -5,7 +5,7 @@
 
 function love.conf(t)
   t.identity    = "hicret"      -- Kayıt klasörü adı
-  t.version     = "11.5"
+  t.version     = "11.4"
   t.console     = false
 
   t.window.title        = "Hicret"
