@@ -43,21 +43,21 @@ jobs:
             --exclude "*.zip" \
             --exclude "*.love" \
             --exclude "*.md" \
-            --exclude "build_web/*"
+            --exclude "build_web/*" \
+            --exclude "temp_dist/*" \
+            --exclude "fetched_game.js" \
+            --exclude "temp_save.lua"
           echo "Package size: $(du -sh hicret.love | cut -f1)"
 
       - name: Build with love.js
         run: |
-          love.js hicret.love dist --title "Hicret" --memory 67108864
-          sed -i "s/80ce17c4-e32b-487e-ad00-d949a302c856/80ce17c4-e32b-487e-ad00-$(date +%s)/g" dist/game.js
-          sed -i "s/'game.data'/'game.data?v=$(date +%s)'/g" dist/game.js
+          love.js -c hicret.love dist --title "Hicret" --memory 67108864
           ls -lh dist/
 
       - name: Apply custom web files
         run: |
           cp web/index.html dist/index.html
-          cp web/coi-serviceworker.min.js dist/coi-serviceworker.min.js
-          echo "Custom files applied"
+          echo "Custom index.html applied"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
