@@ -36,6 +36,7 @@
   </style>
 </head>
 <body>
+  <script src="coi-serviceworker.min.js"></script>
   <div id="loading">
     <div class="ld-title">HİCRET</div>
     <div class="ld-sub">Zulmü İfşa Et &nbsp;·&nbsp; Yolculuğu Yaşa &nbsp;·&nbsp; Tanıklık Et</div>
@@ -120,8 +121,24 @@
       Module.setStatus=function(t){if(t)console.error(t);};
     };
     function applicationLoad(){Love(Module);}
+    function loadGameScripts(){
+      var gs=document.createElement('script');
+      gs.src='game.js';
+      gs.onload=function(){
+        var ls=document.createElement('script');
+        ls.src='love.js';
+        ls.onload=applicationLoad;
+        document.body.appendChild(ls);
+      };
+      document.body.appendChild(gs);
+    }
+    // pthreads build requires SharedArrayBuffer (crossOriginIsolated).
+    // coi-serviceworker registers on first visit and reloads the page.
+    // On second load crossOriginIsolated is true and game scripts load.
+    if(window.crossOriginIsolated){
+      loadGameScripts();
+    }
+    // else: coi-serviceworker will register SW and reload automatically
   </script>
-  <script type="text/javascript" src="game.js"></script>
-  <script async type="text/javascript" src="love.js" onload="applicationLoad()"></script>
 </body>
 </html>

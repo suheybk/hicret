@@ -30,8 +30,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install love.js (v11.5 from GitHub — newer Emscripten fixes WASM bugs)
-        run: npm install -g Davidobot/love.js
+      - name: Install love.js
+        run: npm install -g love.js
 
       - name: Create .love package
         run: |
@@ -51,13 +51,14 @@ jobs:
 
       - name: Build with love.js
         run: |
-          love.js -c hicret.love dist --title "Hicret" --memory 67108864
+          love.js hicret.love dist --title "Hicret" --memory 268435456
           ls -lh dist/
 
       - name: Apply custom web files
         run: |
           cp web/index.html dist/index.html
-          echo "Custom index.html applied"
+          cp web/coi-serviceworker.min.js dist/coi-serviceworker.min.js
+          echo "Custom web files applied"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
