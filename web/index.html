@@ -125,7 +125,18 @@
     };
     function applicationLoad(){Love(Module);}
   </script>
-  <script type="text/javascript" src="game.js?v=3"></script>
-  <script async type="text/javascript" src="love.js?v=3" onload="applicationLoad()"></script>
+  <script>
+    if (window.location.search.includes('wipe=1')) {
+      if (window.indexedDB && window.indexedDB.databases) {
+        window.indexedDB.databases().then(function(dbs) {
+          dbs.forEach(function(db) { window.indexedDB.deleteDatabase(db.name); });
+          console.log("IndexedDB wiped completely.");
+          setTimeout(() => { window.location.href = window.location.pathname; }, 500);
+        });
+      }
+    }
+  </script>
+  <script type="text/javascript" src="game.js?v=4"></script>
+  <script async type="text/javascript" src="love.js?v=4" onload="if(!window.location.search.includes('wipe=1')) applicationLoad()"></script>
 </body>
 </html>
