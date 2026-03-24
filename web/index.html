@@ -121,8 +121,28 @@
       Module.setStatus=function(t){if(t)console.error(t);};
     };
     function applicationLoad(){Love(Module);}
+    function loadGameScripts(){
+      var gs=document.createElement('script');
+      gs.src='game.js';
+      gs.onload=function(){
+        var ls=document.createElement('script');
+        ls.src='love.js';
+        ls.onload=applicationLoad;
+        document.body.appendChild(ls);
+      };
+      document.body.appendChild(gs);
+    }
+    if(window.crossOriginIsolated){
+      loadGameScripts();
+    }else{
+      // coi-serviceworker will register and reload the page;
+      // on reload crossOriginIsolated will be true
+      var coiCheck=setInterval(function(){
+        if(window.crossOriginIsolated){clearInterval(coiCheck);loadGameScripts();}
+      },100);
+      // fallback: if still not isolated after 3s, the SW reload should have happened
+      setTimeout(function(){clearInterval(coiCheck);if(!window.crossOriginIsolated)loadGameScripts();},3000);
+    }
   </script>
-  <script type="text/javascript" src="game.js"></script>
-  <script async type="text/javascript" src="love.js" onload="applicationLoad()"></script>
 </body>
 </html>
