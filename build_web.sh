@@ -14,7 +14,7 @@ GAME_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="${GAME_DIR}/build_web"
 LOVE_FILE="${GAME_DIR}/hicret.love"
 TITLE="Hicret"
-MEMORY=268435456   # 256 MB
+MEMORY=67108864    # 64 MB
 
 SERVE=false
 OPEN=false
