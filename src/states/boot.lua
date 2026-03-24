@@ -33,8 +33,7 @@ function BootState:enter(data)
     end,
     function()
       -- Ses sistemini başlat (SFX ön-sentezi burada yapılır)
-      -- love.audio.setVolume(1.0) ile master kontrol
-      love.audio.setVolume(1.0)
+      -- (Ses ayarları Menü yüklendikten sonra AudioManager tarafından yapılacak)
       AudioManager.init()
     end,
     function()

@@ -72,20 +72,17 @@ end
 -- ─── Başlatma ──────────────────────────────────────────────────────
 
 function AudioManager.init()
-  -- Ayarlardan ses seviyelerini yükle
   local sfx_vol   = SaveSystem.getSetting("sfx",   0.9)
   local music_vol = SaveSystem.getSetting("music",  0.7)
   _vol.sfx     = sfx_vol
   _vol.ambient = music_vol
   _vol.master  = 1.0
 
-  -- SFX'leri ön sentezle (boot sırasında çağrılır, tek seferlik)
-  AudioManager._presynthAll()
+  -- Sesler ilk tıklandıklarında sentezlenecek (WebAudio AutoPlay WASM hatasını önlemek için)
 end
 
-function AudioManager._presynthAll()
-  -- Tip → fabrika fonksiyonu
-  local defs = {
+function AudioManager._getDefs()
+  return {
     typewriter     = function() return Synth.typewriterClick()  end,
     page_flip      = function() return Synth.pageFlip()          end,
     map_hover      = function() return Synth.mapHover()          end,
@@ -95,9 +92,6 @@ function AudioManager._presynthAll()
     weighted_moment= function() return Synth.weightedMoment()    end,
     chapter_done   = function() return Synth.chapterComplete()   end,
   }
-  for name, factory in pairs(defs) do
-    _getCached(name, factory)
-  end
 end
 
 -- ─── SFX ───────────────────────────────────────────────────────────
@@ -106,6 +100,10 @@ end
 -- @param name  string  ses adı
 -- @param vol   number  opsiyonel çarpan (varsayılan 1.0)
 function AudioManager.playSFX(name, vol)
+  if not _cache[name] then
+    local defs = AudioManager._getDefs()
+    if defs[name] then _getCached(name, defs[name]) end
+  end
   local src = _getFreeSFX(name)
   if not src then return end
   local v = (vol or 1.0) * _vol.sfx * _vol.master
