@@ -40,15 +40,23 @@ end
 
 --- Kaydı yükle (yoksa varsayılan oluştur)
 function SaveSystem.load()
-  local raw = love.filesystem.read(SAVE_FILE)
-  if raw then
-    local ok, parsed = pcall(json.decode, raw)
-    if ok and type(parsed) == "table" and parsed.version == SAVE_VERSION then
-      _data = parsed
-      return _data
+  local ok, err = pcall(function()
+    local raw = love.filesystem.read(SAVE_FILE)
+    if raw and type(raw) == "string" then
+      local decode_ok, parsed = pcall(json.decode, raw)
+      if decode_ok and type(parsed) == "table" and parsed.version == SAVE_VERSION then
+        _data = parsed
+        return
+      end
     end
+    _data = _default()
+  end)
+  
+  if not ok then
+    print("[SaveSystem] Fatal Load Error Handled: " .. tostring(err))
+    if not _data then _data = _default() end
   end
-  _data = _default()
+  
   return _data
 end
 
